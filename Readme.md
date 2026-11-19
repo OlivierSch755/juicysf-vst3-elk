@@ -19,7 +19,7 @@ Also at the time of this writing (november 2026), Elk implementation of juicysfp
 
 ## What this is exactly
 
-This repo is a modified version of [juicysfplugin](https://github.com/Birch-san/juicysfplugin) by Alex Birch (same codebase source than the one used by ELK) that I stripped of all UI-related logic and mutexes to help understanding where those issues stem from. 
+This repo is a modified version of [juicysfplugin](https://github.com/Birch-san/juicysfplugin) by Alex Birch (same codebase source than the one used by ELK) that I stripped of all UI-related logic and UI-mutexes to help understanding where those issues stem from. 
 I also rewrote it to avoid JUCE MIDI CC emulation. Everything is declared as VST3 parameter instead, which is closer to Steinberg implementation. 
 
 ## Install from release (Elk-pi)
