@@ -16,10 +16,6 @@ cmake_minimum_required(VERSION 3.22)
 
 project(JUICY_SF_HEADLESS VERSION 0.0.1)
 
-# Debug configuration
-add_compile_options(
-    $<$<CONFIG:Debug>:-Og>
-)
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
 # target), you'll need to tell this project that it depends on the installed copy of JUCE. If you've
 # included JUCE directly in your source tree (perhaps as a submodule), you'll need to tell CMake to
@@ -143,7 +139,7 @@ target_link_libraries(JuicySfHeadless
 		PkgConfig::FLUIDSYNTH
 		elk_vst3_extensions
     PUBLIC
-        juce::juce_recommended_config_flags
+		$<$<CONFIG:Release>:juce::juce_recommended_config_flags>
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 
