@@ -3,8 +3,6 @@
  Edited by Olivier Schwach on 16/11/2026
 */
 
-
-
 #include "FluidSynthModel.h"
 
 // Map MIDI controller nb to paramaterID
@@ -30,9 +28,9 @@ FluidSynthModel::paramToController{[] {
 }()};
 
 FluidSynthModel::FluidSynthModel(
-	juce::AudioProcessorValueTreeState& valueTreeState
+	juce::AudioProcessorValueTreeState& vts
 )
-: valueTreeState{valueTreeState}
+: valueTreeState{vts}
 , settings{ nullptr, nullptr }
 , synth{ nullptr, nullptr }
 , channel{0}
@@ -58,8 +56,6 @@ FluidSynthModel::~FluidSynthModel() {
 
 void FluidSynthModel::initialise() 
 {
-
-	
     // Pass null as driver pointer, fluidsynth will only be rendering blocks 
     const char *audio_driver[] {NULL};
     fluid_audio_driver_register(audio_driver);
@@ -209,12 +205,12 @@ void FluidSynthModel::parameterChanged(const juce::String& parameterID, float ne
             preset = castParam->get();
         }
         int bankOffset{fluid_synth_get_bank_offset(synth.get(), sfont_id)};
-        fluid_synth_program_select(
-            synth.get(),
-            channel,
-            sfont_id,
-            static_cast<unsigned int>(bankOffset + bank),
-            static_cast<unsigned int>(preset)
+		fluid_synth_program_select(
+			synth.get(),
+			channel,
+			sfont_id,
+			bankOffset + bank,
+			preset
 		);
     }
 	else if(parameterID == "pitch"){
@@ -257,7 +253,6 @@ void FluidSynthModel::restoreParameters()
 
 void FluidSynthModel::setSampleRate(float sampleRate) 
 {
-	
     if (!synth) {
 		DBG("Cannot set sample rate, there is no synth...");
         return;
@@ -267,9 +262,6 @@ void FluidSynthModel::setSampleRate(float sampleRate)
 
 void FluidSynthModel::unloadAndLoadFont(const juce::String &absPath) 
 {
-	
-	 DBG("sf: " + absPath);
-	
     // in the base case, there is no font loaded
     if (fluid_synth_sfcount(synth.get()) > 0) {
         // if -1 is returned, that indicates failure
@@ -301,7 +293,6 @@ void FluidSynthModel::loadFont(const juce::String& absPath)
         DBG("SoundFont loaded successfully. ID: " + juce::String(sfont_id));
 	}
 }
-
 
 int FluidSynthModel::getCurrentProgram()
 {
@@ -350,9 +341,6 @@ const juce::String FluidSynthModel::getProgramName(int index)
      return {fluid_preset_get_name(preset)};
 }
 
-
-
-
 void FluidSynthModel::processBlock(
 	juce::AudioBuffer<float>& buffer,
 	juce::MidiBuffer& midiMessages
@@ -361,7 +349,7 @@ void FluidSynthModel::processBlock(
 
 	for (const auto metadata : midiMessages) {
 		const auto& m = metadata.getMessage();
-		const int time = metadata.samplePosition;
+		// const int time = metadata.samplePosition;
         if (m.isNoteOn()) {
             fluid_synth_noteon(
                 synth.get(),
@@ -395,5 +383,3 @@ void FluidSynthModel::processBlock(
         const_cast<float**>(buffer.getArrayOfWritePointers())
 	);
 }
-
-

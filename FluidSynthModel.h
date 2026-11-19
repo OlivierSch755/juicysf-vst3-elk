@@ -15,7 +15,7 @@ class FluidSynthModel
 : public juce::AudioProcessorValueTreeState::Listener 
 {
 public:
-    FluidSynthModel( juce::AudioProcessorValueTreeState& valueTreeState );
+    FluidSynthModel( juce::AudioProcessorValueTreeState& vts );
     ~FluidSynthModel();
     void initialise();
 	void setSampleRate(float sampleRate);
