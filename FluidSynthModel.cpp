@@ -1,3 +1,10 @@
+/*
+ Created by Alex Birch on 10/09/2017.
+ Edited by Olivier Schwach on 16/11/2026
+*/
+
+
+
 #include "FluidSynthModel.h"
 
 // Map MIDI controller nb to paramaterID
