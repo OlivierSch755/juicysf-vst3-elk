@@ -1,0 +1,3 @@
+[submodule "elk-plugin-extensions"]
+	path = elk-plugin-extensions
+	url = https://github.com/elk-audio/elk-plugin-extensions.git
