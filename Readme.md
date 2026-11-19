@@ -25,6 +25,13 @@ I also rewrote it to avoid JUCE MIDI CC emulation. Everything is declared as VST
 ## Build
 You should be using Elk Audio SDK and I strongly recommand using the [docker image](https://github.com/elk-audio/elk-audio-os-builder) which comes will all dependencies. 
 
+### Download 
+```sh
+git clone --recursive https://github.com/OlivierSch755/juicysf-vst3-elk.git
+cd juicysf-vst3-elk/
+```
+
+### Compile 
 ```sh
 # You need to source the SDK.
 # If using Docker container, the path will be /SDKs/elkpi/environment-setup-cortexa72-elk-linux
@@ -38,19 +45,61 @@ cmake -DCMAKE_BUILD_TYPE=Release -B build -S .
 cmake --build build --parallel --config Release
 ```
 
-Change Build type to "Debug" if needed for development. 
+Change Build type to "Debug" if needed for development (see section below)
 
+### Installation
+Successful build will produce ``build/JuicySfHeadless_artefacts/Release/VST3/JuicySfHeadless.vst3/``.
+Copy this directory in the directory where your Elk box stores its VST3 plugins. 
 
-
+#### Elk-Pi plugin discovery (Sushi web-ui)
+To enable loading this plugin via Sushi web-ui on Elk-Pi, I suggest the following procedure:
+- make a copy of ``/usr/share/sushi-webui/installed_plugins.json``.
+- add this entry to the copy under ``plugins``.``VST3 Synths``:
+```json
+"Sflight": {
+  "name": "JuicySfHeadless",
+  "type": "vst3x",
+  "uid": "JuicySfHeadless",
+  "path": "/home/mind/plugins/JuicySfHeadless.vst3",
+  "role": "instrument"
+}
+```
+replace ``/home/mind/plugins/JuicySfHeadless.vst3`` by the actual location where you uploaded the plugin (or use the same one).
+- run ``sushi-webui --plugin-list path_to_your_copy_of/installed_plugins.json`` to load the web-ui with the updated plugin list.
 
 ## Limitations and issues
-There are still occurrences of soundfont_path string property not being restored in Sushi 1.4.0. It happens **way less frequently** in this version but it still does. 
-I could track the issue to that function ```ElkVST3Extensions::propertyValueChanged(Steinberg::int32 propertyId, const elk::PropertyValue& value)```. My observation is that this notification is not received by the plugin when SF restoration fails. Which hints at a race condition somewhere (my guess is that the notification is fired before the plugin listener subscribed)
 
+### Soundfont loading
+There are still occurrences of soundfont_path string property not being restored in Sushi 1.4.0. It happens **way less frequently** in this version but it still does. 
+I could track the issue to the function  not being called in rare occasions. 
+
+My observation is that the notification ```ElkVST3Extensions::propertyValueChanged()``` can sometimes be missed by the plugin instance. Which hints at a race condition somewhere (my guess is that the notification may be fired before the plugin listener subscribed).
+When this happens, the soundfont loading procedure does not run. 
+
+### Host having stale parameter data after restoring
 Some parameters update seems to be also missed by Sushi when querying its inner state with gRPC.
 
-I may have broken aftertouch in the process. 
+### Unclear program discovery procedure
+Still under investigation.
 
+
+### Aftertouch not implemented
+I skipped aftertouch while implementing this as I have no device that supports this feature for testing. 
+I may need to use Midish and build a small MIDI track to reimplement this properly.
+This might prove painful without JUCE_VST3_EMULATE_MIDI_CC_WITH_PARAMETERS...  
+
+
+## Development 
+
+To make a debug build (print loading soundfont attempts, success and failure):
+### Compile 
+```sh
+# Configure
+cmake -DCMAKE_BUILD_TYPE=Debug -B build -S .
+
+# Build
+cmake --build build --parallel --config Debug
+```
 
 
 ## Credits 
