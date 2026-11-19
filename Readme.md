@@ -71,10 +71,8 @@ replace ``/home/mind/plugins/JuicySfHeadless.vst3`` by the actual location where
 
 ### Soundfont loading
 There are still occurrences of soundfont_path string property not being restored in Sushi 1.4.0. It happens **way less frequently** in this version but it still does. 
-I could track the issue to the function  not being called in rare occasions. 
-
 My observation is that the notification ```ElkVST3Extensions::propertyValueChanged()``` can sometimes be missed by the plugin instance. Which hints at a race condition somewhere (my guess is that the notification may be fired before the plugin listener subscribed).
-When this happens, the soundfont loading procedure does not run. 
+When this happens, the soundfont loading procedure simply does not run. 
 
 ### Host having stale parameter data after restoring
 Some parameters update seems to be also missed by Sushi when querying its inner state with gRPC.
