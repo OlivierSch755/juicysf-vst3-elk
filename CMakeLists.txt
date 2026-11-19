@@ -145,3 +145,15 @@ target_link_libraries(JuicySfHeadless
 
 target_compile_options(JuicySfHeadless PRIVATE -flto=auto)
 target_link_options(JuicySfHeadless PRIVATE -flto=auto)
+
+
+# Strip if Release
+add_custom_command(TARGET JuicySfHeadless_VST3 POST_BUILD
+    COMMAND
+        $<$<CONFIG:Release>:${CMAKE_STRIP}>
+        $<$<CONFIG:Release>:--strip-unneeded>
+        $<$<CONFIG:Release>:$<TARGET_FILE:JuicySfHeadless_VST3>>
+    COMMENT "Stripping JuicySfHeadless VST3 (Release)"
+    VERBATIM
+)
+
